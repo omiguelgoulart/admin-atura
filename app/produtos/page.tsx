@@ -1,26 +1,38 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProdutos } from "./stores/useProdutos";
 import ProdutoCard from "./components/ProdutoCard";
 import { Indicadores } from "./components/Indicadores";
 import { Atalhos } from "./components/Atalhos";
 import { FormProduto } from "./components/FormProduto";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export default function ProdutosPage() {
   const { produtos, carregarProdutos, deletarProduto } = useProdutos();
 
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     carregarProdutos();
   }, [carregarProdutos]);
 
-
   return (
-    <div className="space-y-6">
+    <div className="m-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Produtos</h1>
-        <FormProduto open={false} onOpenChange={() => {}} />
+
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              Novo Produto
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg">
+            <FormProduto open={open} onOpenChange={setOpen} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Indicadores />
@@ -36,7 +48,6 @@ export default function ProdutosPage() {
           />
         ))}
       </div>
-
     </div>
   );
 }
