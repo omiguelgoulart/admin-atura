@@ -3,12 +3,13 @@ export interface Marca {
   nome: string;
 }
 
+export type CategoriaProduto = "MASCULINO" | "FEMININO" | "INFANTIL" | "UNISSEX";
 export interface Produto {
   id: number;
   nome: string;
   descricao: string;
   preco: number;
-  categoria: string;
+  categoria: CategoriaProduto; // <- alterado aqui
   estoque: number;
   volumeMl: number;
   foto: string;

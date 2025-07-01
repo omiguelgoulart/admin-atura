@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import { Produto } from "../types/ProdutoItf";
+import { Produto, CategoriaProduto } from "../types/ProdutoItf";
 import { useForm } from "react-hook-form";
 import { useMarcas } from "../stores/useMarcas";
 import { useProdutos } from "../stores/useProdutos";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormMarca } from "./FormMarca";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface Props {
   open: boolean;
@@ -20,7 +21,7 @@ interface Props {
 
 type FormValues = {
   nome: string;
-  categoria: string;
+  categoria: CategoriaProduto; // <- mudou aqui
   descricao: string;
   preco: string;
   estoque: string;
@@ -29,8 +30,9 @@ type FormValues = {
   marcaId?: string;
 };
 
+
 export function FormProduto({ open, onOpenChange, produto }: Props) {
-  const { register, handleSubmit, setValue, reset } = useForm<FormValues>();
+  const { register, handleSubmit, setValue, reset, watch } = useForm<FormValues>();
   const { marcas, carregarMarcas } = useMarcas();
   const { criarProduto, editarProduto } = useProdutos();
 
@@ -89,6 +91,11 @@ const onSubmit = async (data: FormValues) => {
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>{produto ? "Editar Produto" : "Novo Produto"}</DialogTitle>
+          <VisuallyHidden>
+            <DialogDescription>
+              Formulário para {produto ? "editar" : "cadastrar"} produto.
+            </DialogDescription>
+          </VisuallyHidden>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
@@ -99,7 +106,20 @@ const onSubmit = async (data: FormValues) => {
             </div>
             <div>
               <Label>Categoria</Label>
-              <Input {...register("categoria", { required: true })} />
+              <Select
+                value={watch("categoria")}
+                onValueChange={(value) => setValue("categoria", value as CategoriaProduto)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MASCULINO">Masculino</SelectItem>
+                  <SelectItem value="FEMININO">Feminino</SelectItem>
+                  <SelectItem value="INFANTIL">Infantil</SelectItem>
+                  <SelectItem value="UNISSEX">Unissex</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -134,12 +154,9 @@ const onSubmit = async (data: FormValues) => {
             <Label>Marca</Label>
             <div className="flex items-center gap-2">
               <Select
-              value={produto?.marca?.id?.toString()}
-              onValueChange={(id) => {
-                const m = marcas.find((marca) => marca.id === Number(id));
-                if (m) setValue("marcaId", String(m.id)); // Atualiza o campo marcaId corretamente
-              }}
-            >
+                value={watch("marcaId")}
+                onValueChange={(id) => setValue("marcaId", id)}
+              >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a marca" />
               </SelectTrigger>
