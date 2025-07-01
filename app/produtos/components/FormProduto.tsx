@@ -5,12 +5,7 @@ import { Produto } from "../types/ProdutoItf";
 import { useForm } from "react-hook-form";
 import { useMarcas } from "../stores/useMarcas";
 import { useProdutos } from "../stores/useProdutos";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,8 +18,19 @@ interface Props {
   produto?: Produto;
 }
 
+type FormValues = {
+  nome: string;
+  categoria: string;
+  descricao: string;
+  preco: string;
+  estoque: string;
+  volumeMl?: string;
+  foto?: string;
+  marcaId?: string;
+};
+
 export function FormProduto({ open, onOpenChange, produto }: Props) {
-  const { register, handleSubmit, setValue, reset } = useForm<Produto>();
+  const { register, handleSubmit, setValue, reset } = useForm<FormValues>();
   const { marcas, carregarMarcas } = useMarcas();
   const { criarProduto, editarProduto } = useProdutos();
 
@@ -34,34 +40,49 @@ export function FormProduto({ open, onOpenChange, produto }: Props) {
 
   useEffect(() => {
     if (produto) {
-      reset(produto);
+      reset({
+        nome: produto.nome,
+        categoria: produto.categoria,
+        descricao: produto.descricao,
+        preco: String(produto.preco),
+        estoque: String(produto.estoque),
+        volumeMl: produto.volumeMl ? String(produto.volumeMl) : "",
+        foto: produto.foto ?? "",
+        marcaId: produto.marca?.id ? String(produto.marca.id) : undefined,
+      });
     } else {
       reset();
     }
   }, [produto, reset]);
 
-  const onSubmit = async (data: Produto) => {
-    const dados = {
-      ...data,
-      preco: Number(data.preco),
-      estoque: Number(data.estoque),
-      volumeMl: data.volumeMl !== undefined && data.volumeMl !== null && String(data.volumeMl) !== "" ? Number(data.volumeMl) : 0,
-      marcaId: data.marca?.id,
-    };
+const onSubmit = async (data: FormValues) => {
+  console.log("Dados do formulário:", data);
 
-    if (produto?.id) {
-      await editarProduto(produto.id, dados);
-    } else {
-      await criarProduto(dados);
-    }
+  const marcaSelecionada = marcas.find((m) => String(m.id) === data.marcaId);
+  if (!marcaSelecionada) {
+    alert("Selecione uma marca");
+    return;
+  }
 
-    onOpenChange(false);
+  const dados = {
+    nome: data.nome,
+    descricao: data.descricao,
+    preco: Number(data.preco),
+    categoria: data.categoria,
+    estoque: Number(data.estoque),
+    foto: data.foto ?? "",
+    volumeMl: data.volumeMl ? Number(data.volumeMl) : 0,
+    marcaId: Number(data.marcaId), // ✅ apenas isso é necessário
   };
 
-  const handleMarcaChange = (id: string) => {
-    const m = marcas.find((marca) => marca.id === Number(id));
-    if (m) setValue("marca", m);
-  };
+  if (produto?.id) {
+    await editarProduto(produto.id, dados);
+  } else {
+    await criarProduto(dados);
+  }
+
+  onOpenChange(false);
+};
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -112,18 +133,24 @@ export function FormProduto({ open, onOpenChange, produto }: Props) {
           <div>
             <Label>Marca</Label>
             <div className="flex items-center gap-2">
-              <Select onValueChange={handleMarcaChange} defaultValue={produto?.marca?.id?.toString()}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a marca" />
-                </SelectTrigger>
-                <SelectContent>
-                  {marcas.map((m) => (
-                    <SelectItem key={m.id} value={String(m.id)}>
-                      {m.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Select
+              value={produto?.marca?.id?.toString()}
+              onValueChange={(id) => {
+                const m = marcas.find((marca) => marca.id === Number(id));
+                if (m) setValue("marcaId", String(m.id)); // Atualiza o campo marcaId corretamente
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a marca" />
+              </SelectTrigger>
+              <SelectContent>
+                {marcas.map((m) => (
+                  <SelectItem key={m.id} value={String(m.id)}>
+                    {m.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
               <FormMarca onNovaMarca={(nome) => console.log(nome)} />
             </div>
           </div>

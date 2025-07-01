@@ -2,15 +2,33 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import { Produto } from "../types/ProdutoItf";
 
+type ProdutoFormData = {
+  nome: string;
+  preco: number;
+  estoque: number;
+  categoria: string;
+  descricao: string;
+  volumeMl?: number;
+  foto?: string;
+  marcaId: number;
+};
+
 type ProdutoStore = {
   produtos: Produto[];
+  todosProdutos?: Produto[];
   loading: boolean;
   erro: string | null;
 
   carregarProdutos: () => Promise<void>;
   deletarProduto: (id: number) => Promise<void>;
-  criarProduto: (produto: Omit<Produto, 'id'>) => Promise<void>;
-  editarProduto: (id: number, produto: Omit<Produto, 'id'>) => Promise<void>;
+  criarProduto: (produto: ProdutoFormData) => Promise<void>;
+  editarProduto: (id: number, produto: ProdutoFormData) => Promise<void>;
+  filtrarProdutos: (filtros: {
+    marcaId?: string;
+    categoria?: string;
+    precoMin?: string;
+    precoMax?: string;
+  }) => void;
 };
 
 export const useProdutos = create<ProdutoStore>((set, get) => ({
@@ -113,5 +131,27 @@ export const useProdutos = create<ProdutoStore>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  filtrarProdutos: (filtros) => {
+    const { todosProdutos } = get();
+    const produtosFiltrados = (todosProdutos ?? []).filter((produto) => {
+      const marcaMatch = filtros.marcaId
+        ? produto.marca?.id === Number(filtros.marcaId)
+        : true;
+      const categoriaMatch = filtros.categoria
+        ? produto.categoria === filtros.categoria
+        : true;
+      const precoMinMatch = filtros.precoMin
+        ? produto.preco >= Number(filtros.precoMin)
+        : true;
+      const precoMaxMatch = filtros.precoMax
+        ? produto.preco <= Number(filtros.precoMax)
+        : true;
+
+      return marcaMatch && categoriaMatch && precoMinMatch && precoMaxMatch;
+    });
+
+    set({ produtos: produtosFiltrados });
   },
 }));

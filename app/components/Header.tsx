@@ -10,7 +10,6 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Oculta o header na página de login
   if (pathname === "/login") return null;
 
   const handleLogout = () => {
