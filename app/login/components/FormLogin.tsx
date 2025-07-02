@@ -68,8 +68,6 @@ export default function FormLogin({ tipo, onSubmit }: FormLoginProps) {
       <Button type="submit" className="w-full">
         {tipo === "login"
           ? "Entrar"
-          : tipo === "cadastro"
-          ? "Cadastrar"
           : "Recuperar Senha"}
       </Button>
     </form>

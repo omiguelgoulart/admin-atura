@@ -1,21 +1,17 @@
 "use client";
 
-import { LogOut, Menu } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+import { Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Deslogar } from "./Logout";
 
 export function Header() {
-  const router = useRouter();
   const pathname = usePathname();
 
   if (pathname === "/login") return null;
 
-  const handleLogout = () => {
-    localStorage.removeItem("admin-token");
-    router.push("/login");
-  };
 
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b bg-background">
@@ -54,14 +50,7 @@ export function Header() {
         </Sheet>
 
         {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="text-muted-foreground hover:text-destructive transition"
-          title="Sair"
-        >
-          <LogOut className="h-5 w-5" />
-          <span className="sr-only">Sair</span>
-        </button>
+        <Deslogar />
       </div>
     </header>
   );

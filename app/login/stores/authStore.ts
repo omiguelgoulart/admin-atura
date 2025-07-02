@@ -1,32 +1,45 @@
 import { create } from "zustand";
 import { toast } from "sonner";
 
+// Tipo usado no login, cadastro e redefinição de senha
 type AuthData = {
   nome?: string;
   email: string;
   senha: string;
-  codigo?: string;
+  codigo?: string; // usado na redefinição de senha
 };
 
-type AuthStore = {
-  isLoading: boolean;
-  error: string | null;
-  user: { nome: string; email: string } | null;
+// Representa o usuário autenticado
+type User = {
+  id: string;
+  nome: string;
+  email: string;
+};
 
+// Definição do estado e ações da store
+type AuthStore = {
+  isLoading: boolean; // controle de carregamento
+  error: string | null; // erro atual
+  user: User | null; // dados do usuário logado
+
+  // Ações
   login: (data: AuthData) => Promise<void>;
   cadastro: (data: AuthData) => Promise<void>;
   recuperarSenha: (data: Pick<AuthData, "email">) => Promise<void>;
   redefinirSenha: (data: Required<AuthData>) => Promise<void>;
 
-  setError: (msg: string | null) => void;
-  setUser: (user: AuthStore["user"]) => void;
+  logout: () => void; // limpa estado e cookie
+  setError: (msg: string | null) => void; // define erro manualmente
+  setUser: (user: AuthStore["user"]) => void; // define usuário manualmente
 };
 
+// Criação da store com Zustand
 export const useAuthStore = create<AuthStore>((set) => ({
   isLoading: false,
   error: null,
   user: null,
 
+  // 🔐 Login do usuário
   login: async (data) => {
     set({ isLoading: true, error: null });
     try {
@@ -39,7 +52,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Erro no login");
 
-      set({ user: { nome: result.nome, email: result.email } });
+      const userData = {
+        id: result.id,
+        nome: result.nome,
+        email: result.email,
+      };
+
+      set({ user: userData });
+
+      // Salva os dados do admin no cookie (visível no client)
+      document.cookie = `admin=${encodeURIComponent(JSON.stringify(userData))}; path=/;`;
+
       toast.success("Login realizado com sucesso!");
     } catch (err: unknown) {
       console.error("Erro no login:", err);
@@ -55,6 +78,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
+  // 👤 Cadastro de novo admin
   cadastro: async (data) => {
     set({ isLoading: true, error: null });
     try {
@@ -67,7 +91,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Erro no cadastro");
 
-      set({ user: { nome: result.nome, email: result.email } });
+      const userData = {
+        id: result.id,
+        nome: result.nome,
+        email: result.email,
+      };
+
+      set({ user: userData });
+
+      // Salva no cookie
+      document.cookie = `admin=${encodeURIComponent(JSON.stringify(userData))}; path=/;`;
+
       toast.success("Cadastro realizado com sucesso!");
     } catch (err: unknown) {
       console.error("Erro no cadastro:", err);
@@ -83,6 +117,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
+  // 📧 Envia código de recuperação de senha para o e-mail
   recuperarSenha: async ({ email }) => {
     set({ isLoading: true, error: null });
     try {
@@ -113,6 +148,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
+  // 🔁 Redefine a senha com código
   redefinirSenha: async ({ email, codigo, senha }) => {
     set({ isLoading: true, error: null });
     try {
@@ -143,6 +179,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
     }
   },
 
+  // 🚪 Logout: limpa o estado e remove o cookie
+  logout: () => {
+    set({ user: null });
+    document.cookie = `admin=; Max-Age=0; path=/;`; // remove o cookie
+    toast.success("Logout realizado com sucesso!");
+  },
+
+  // 🔧 Define erro manualmente
   setError: (msg) => set({ error: msg }),
+
+  // 👤 Define usuário manualmente
   setUser: (user) => set({ user }),
 }));
