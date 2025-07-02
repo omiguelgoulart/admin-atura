@@ -26,7 +26,7 @@ export function Header() {
       <div className="flex items-center gap-6">
         {/* Navegação para desktop */}
         <nav className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
-          <Link href="/dashboard" className="hover:text-foreground transition">Dashboard</Link>
+          <Link href="/" className="hover:text-foreground transition">Dashboard</Link>
           <Link href="/produtos" className="hover:text-foreground transition">Produtos</Link>
           <Link href="/avaliacao" className="hover:text-foreground transition">Avaliações</Link>
         </nav>

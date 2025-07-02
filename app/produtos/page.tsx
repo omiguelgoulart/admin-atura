@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react";
 import { useProdutos } from "./stores/useProdutos";
 import ProdutoCard from "./components/ProdutoCard";
-import { Indicadores } from "./components/Indicadores";
-import { Atalhos } from "./components/Atalhos";
 import { FormProduto } from "./components/FormProduto";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FiltroProduto } from "./components/FiltroProduto";
 
 export default function ProdutosPage() {
-  const { produtos, carregarProdutos, deletarProduto, filtrarProdutos } = useProdutos();
+  const { produtos, carregarProdutos, deletarProduto, filtrarProdutos } =
+    useProdutos();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -34,15 +33,11 @@ export default function ProdutosPage() {
         </Dialog>
       </div>
 
-      {/* Indicadores e Atalhos */}
-      <Indicadores />
-      <Atalhos />
-
       {/* Filtros */}
-      <FiltroProduto 
-      onFiltrar={(filtros) => filtrarProdutos(filtros)}
-      onLimpar={() => filtrarProdutos({})}
-       />
+      <FiltroProduto
+        onFiltrar={(filtros) => filtrarProdutos(filtros)}
+        onLimpar={() => filtrarProdutos({})}
+      />
 
       {/* Lista de produtos */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
