@@ -1,20 +1,22 @@
 import { create } from "zustand";
 import { toast } from "sonner";
 
+
+
 // Tipo usado no login, cadastro e redefinição de senha
-type AuthData = {
-  nome?: string;
+export type AuthData = {
   email: string;
   senha: string;
-  codigo?: string; // usado na redefinição de senha
+  tipo?: string; // Adiciona a propriedade 'tipo' como opcional
+  codigo?: string; // Para redefinição de senha
 };
 
 // Representa o usuário autenticado
 type User = {
   id: string;
   nome: string;
-  email: string;
-};
+    email: string;
+  };
 
 // Definição do estado e ações da store
 type AuthStore = {
@@ -38,6 +40,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isLoading: false,
   error: null,
   user: null,
+
+  
 
   // 🔐 Login do usuário
   login: async (data) => {
@@ -182,8 +186,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
   // 🚪 Logout: limpa o estado e remove o cookie
   logout: () => {
     set({ user: null });
-    document.cookie = `admin=; Max-Age=0; path=/;`; // remove o cookie
+    document.cookie = `admin=; Max-Age=0; path=/;`;
     toast.success("Logout realizado com sucesso!");
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 2000);
   },
 
   // 🔧 Define erro manualmente

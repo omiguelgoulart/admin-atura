@@ -4,49 +4,35 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-interface LoginData {
-  email: string;
-  senha: string;
-}
+// Tipos
+type LoginData = { email: string; senha: string };
+type RecuperarData = { email: string };
 
-interface CadastroData extends LoginData {
-  nome: string;
-}
+type FormLoginProps<T> = {
+  tipo: "login" | "recuperar";
+  onSubmit: (data: T) => void;
+  isSubmitting: boolean;
+};
 
-type FormData = LoginData | CadastroData;
-
-interface FormLoginProps {
-  tipo: "login" | "cadastro" | "recuperar";
-  onSubmit: (data: FormData) => void;
-  isSubmitting: boolean; // ✅ Adiciona esta linha
-}
-
-
-export default function FormLogin({ tipo, onSubmit }: FormLoginProps) {
+export default function FormLogin<T extends LoginData | RecuperarData>({
+  tipo,
+  onSubmit,
+  isSubmitting,
+}: FormLoginProps<T>) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [nome, setNome] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = tipo === "cadastro"
-  ? { nome, email, senha, tipo: "admin" }
-  : { email, senha, tipo: "admin" }; // 👈 adiciona tipo aqui
-    onSubmit(data);
+    if (tipo === "login") {
+      onSubmit({ email, senha } as T);
+    } else {
+      onSubmit({ email } as T);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {tipo === "cadastro" && (
-        <Input
-          type="text"
-          placeholder="Nome completo"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-        />
-      )}
-
       <Input
         type="email"
         placeholder="E-mail"
@@ -55,7 +41,7 @@ export default function FormLogin({ tipo, onSubmit }: FormLoginProps) {
         required
       />
 
-      {tipo !== "recuperar" && (
+      {tipo === "login" && (
         <Input
           type="password"
           placeholder="Senha"
@@ -65,8 +51,10 @@ export default function FormLogin({ tipo, onSubmit }: FormLoginProps) {
         />
       )}
 
-      <Button type="submit" className="w-full">
-        {tipo === "login"
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting
+          ? "Enviando..."
+          : tipo === "login"
           ? "Entrar"
           : "Recuperar Senha"}
       </Button>

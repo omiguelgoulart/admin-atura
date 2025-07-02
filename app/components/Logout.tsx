@@ -13,6 +13,7 @@ export function Deslogar() {
       <button onClick={logout}>
           <LogOut className="h-5 w-5" />
           <span className="sr-only">Sair</span>
+          
       </button>
     </div>
   );
