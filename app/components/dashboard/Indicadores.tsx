@@ -44,13 +44,24 @@ export function Indicadores({ produtos }: { produtos: Produto[] }) {
               <DialogTitle>Produtos com estoque baixo</DialogTitle>
             </DialogHeader>
             {produtosComEstoqueBaixo.length > 0 ? (
-              <ul className="space-y-2 max-h-[300px] overflow-y-auto">
-                {produtosComEstoqueBaixo.map((p) => (
-                  <li key={p.id} className="text-sm text-gray-800 dark:text-gray-100">
-                    <strong>{p.nome}</strong> — {p.estoque} unidade(s)
-                  </li>
-                ))}
-              </ul>
+                <table className="min-w-full text-sm">
+                <thead>
+                  <tr>
+                  <th className="text-left font-semibold py-1 px-2">Produto</th>
+                  <th className="text-left font-semibold py-1 px-2">Marca</th>
+                  <th className="text-left font-semibold py-1 px-2">Estoque</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {produtosComEstoqueBaixo.map((p) => (
+                  <tr key={p.id}>
+                    <td className="py-1 px-2">{p.nome}</td>
+                    <td className="py-1 px-2">{p.marca.nome}</td>
+                    <td className="py-1 px-2">{p.estoque}</td>
+                  </tr>
+                  ))}
+                </tbody>
+                </table>
             ) : (
               <p className="text-sm text-muted-foreground">Nenhum produto com estoque baixo.</p>
             )}
