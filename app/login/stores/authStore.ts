@@ -126,7 +126,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/login/envia-codigo`,
+        `${process.env.NEXT_PUBLIC_URL_API}/login/recupera-senha`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
