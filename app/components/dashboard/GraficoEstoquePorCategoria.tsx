@@ -1,9 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { VictoryPie } from "victory";
 import { Produto } from "../../produtos/types/ProdutoItf";
 
 export function GraficoEstoquePorCategoria({ produtos }: { produtos: Produto[] }) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const match = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkMode(match.matches);
+    const listener = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    match.addEventListener("change", listener);
+    return () => match.removeEventListener("change", listener);
+  }, []);
+
   const dadosPorCategoria = produtos.reduce<Record<string, number>>((acc, produto) => {
     acc[produto.categoria] = (acc[produto.categoria] || 0) + produto.estoque;
     return acc;
@@ -16,8 +27,8 @@ export function GraficoEstoquePorCategoria({ produtos }: { produtos: Produto[] }
 
   if (dataChart.length === 0) return null;
 
-  // Cores fixas baseadas em tons do Tailwind/ShadCN
-  const colorScale = ["#4ade80", "#60a5fa", "#facc15", "#f87171", "#c084fc"];
+  const colorScaleLight = ["#4ade80", "#60a5fa", "#facc15", "#f87171", "#c084fc"];
+  const colorScaleDark = ["#22c55e", "#3b82f6", "#eab308", "#ef4444", "#a855f7"];
 
   return (
     <div className="rounded-xl border bg-background p-6 shadow-sm space-y-4">
@@ -27,11 +38,11 @@ export function GraficoEstoquePorCategoria({ produtos }: { produtos: Produto[] }
       <div className="h-[400px]">
         <VictoryPie
           data={dataChart}
-          colorScale={colorScale}
+          colorScale={isDarkMode ? colorScaleDark : colorScaleLight}
           labels={({ datum }) => `${datum.x}: ${datum.y}`}
           style={{
             labels: {
-              fill: "#0f172a", // slate-900 - pode ajustar dinamicamente se quiser
+              fill: isDarkMode ? "#f1f5f9" : "#0f172a", // texto adaptado ao modo
               fontSize: 14,
               fontWeight: "bold",
             },

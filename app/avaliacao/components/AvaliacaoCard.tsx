@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avaliacao } from "../types/AvaliacaoItf";
-import ResponderAvaliacao from "./ResponderAvaliacao";
+import { ResponderAvaliacao } from "./ResponderAvaliacao";
 
 interface Props {
   avaliacao: Avaliacao;

@@ -7,8 +7,19 @@ import {
   VictoryAxis,
 } from "victory";
 import { Produto } from "../../produtos/types/ProdutoItf";
+import { useEffect, useState } from "react";
 
 export function GraficoTopProdutosEstoque({ produtos }: { produtos: Produto[] }) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const match = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDarkMode(match.matches);
+    const listener = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    match.addEventListener("change", listener);
+    return () => match.removeEventListener("change", listener);
+  }, []);
+
   const produtosOrdenados = [...produtos]
     .sort((a, b) => b.estoque - a.estoque)
     .slice(0, 5);
@@ -37,7 +48,7 @@ export function GraficoTopProdutosEstoque({ produtos }: { produtos: Produto[] })
                 fontSize: 10,
                 angle: -40,
                 textAnchor: "end",
-                fill: "#0f172a", // slate-900
+                fill: isDarkMode ? "#f1f5f9" : "#0f172a", // texto eixo X
               },
             }}
           />
@@ -45,9 +56,12 @@ export function GraficoTopProdutosEstoque({ produtos }: { produtos: Produto[] })
             dependentAxis
             tickFormat={(tick) => `${tick}`}
             style={{
-              tickLabels: { fill: "#0f172a" },
-              axis: { stroke: "#e5e7eb" },
-              grid: { stroke: "#e5e7eb", strokeDasharray: "4" },
+              tickLabels: { fill: isDarkMode ? "#f1f5f9" : "#0f172a" }, // texto eixo Y
+              axis: { stroke: isDarkMode ? "#475569" : "#e5e7eb" },
+              grid: {
+                stroke: isDarkMode ? "#475569" : "#e5e7eb",
+                strokeDasharray: "4",
+              },
             }}
           />
           <VictoryBar
@@ -55,8 +69,13 @@ export function GraficoTopProdutosEstoque({ produtos }: { produtos: Produto[] })
             labels={({ datum }) => datum.y}
             animate={{ duration: 1500 }}
             style={{
-              data: { fill: "#60a5fa" }, // azul-400 (pode trocar pela sua cor primária)
-              labels: { fill: "#0f172a", fontWeight: "bold" },
+              data: {
+                fill: isDarkMode ? "#3b82f6" : "#60a5fa", // azul-500 (dark) / azul-400 (light)
+              },
+              labels: {
+                fill: isDarkMode ? "#f1f5f9" : "#0f172a",
+                fontWeight: "bold",
+              },
             }}
           />
         </VictoryChart>

@@ -14,16 +14,16 @@ export function KPICards({ produtos }: { produtos: Produto[] }) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div className="p-4 border rounded-md bg-white shadow">
-        <p className="text-gray-500 text-sm">Total de Produtos</p>
+      <div className="p-4 border rounded-md bg-card text-card-foreground shadow">
+        <p className="text-sm text-muted-foreground">Total de Produtos</p>
         <h3 className="text-2xl font-bold">{totalProdutos}</h3>
       </div>
-      <div className="p-4 border rounded-md bg-white shadow">
-        <p className="text-gray-500 text-sm">Total em Estoque</p>
+      <div className="p-4 border rounded-md bg-card text-card-foreground shadow">
+        <p className="text-sm text-muted-foreground">Total em Estoque</p>
         <h3 className="text-2xl font-bold">{totalEstoque}</h3>
       </div>
-      <div className="p-4 border rounded-md bg-white shadow">
-        <p className="text-gray-500 text-sm">Categorias</p>
+      <div className="p-4 border rounded-md bg-card text-card-foreground shadow">
+        <p className="text-sm text-muted-foreground">Categorias</p>
         <h3 className="text-2xl font-bold">{categoriasUnicas.size}</h3>
       </div>
     </div>

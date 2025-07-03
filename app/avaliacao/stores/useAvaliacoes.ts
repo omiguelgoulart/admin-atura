@@ -30,7 +30,7 @@ type AvaliacaoStore = {
 
   carregarAvaliacoes: () => Promise<void>;
   excluirAvaliacao: (id: number) => Promise<void>;
-  responderAvaliacao: (avaliacaoId: number, mensagem: string) => Promise<void>;
+  responderAvaliacao: (avaliacaoId: number, mensagem: string, adminId: string) => Promise<void>;
 };
 
 export const useAvaliacoes = create<AvaliacaoStore>((set, get) => ({
@@ -70,19 +70,18 @@ export const useAvaliacoes = create<AvaliacaoStore>((set, get) => ({
     }
   },
 
-  responderAvaliacao: async (avaliacaoId, mensagem) => {
+  responderAvaliacao: async (avaliacaoId, mensagem, adminId) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/respostas/${avaliacaoId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ mensagem }),
+        body: JSON.stringify({ mensagem, adminId }),
       });
 
       if (!res.ok) throw new Error("Erro ao responder");
 
-      // Recarrega as avaliações atualizadas com novas respostas
       await get().carregarAvaliacoes();
     } catch {
       set({ erro: "Erro ao responder avaliação" });
